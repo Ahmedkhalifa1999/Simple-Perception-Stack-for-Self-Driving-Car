@@ -61,10 +61,9 @@ def draw_values(img,left_curvature,right_curvature, center_distance):
     
         offset_y = 100
         offset_x = 100
-
+        
         template = "{0:17}{1:17}{2:17}"
         txt_header = template.format("Left Curvature", "Right Curvature", "Center offset and Alignment")
-        # print(txt_header)
         txt_values = template.format("{:.4f}m".format(left_curvature),
                                      "{:.4f}m".format(right_curvature),
                                      "{:.4f}m Right".format(center_distance))
@@ -72,8 +71,6 @@ def draw_values(img,left_curvature,right_curvature, center_distance):
             txt_values = template.format("{:.4f}m".format(left_curvature),
                                          "{:.4f}m".format(right_curvature),
                                          "{:.4f}m Left".format(fabs(center_distance)))
-
-        # print(txt_values)
         font = cv.FONT_HERSHEY_SIMPLEX
         cv.putText(img, txt_header, (offset_x, offset_y), font, 1, (255, 255, 255), 1, cv.LINE_AA)
         cv.putText(img, txt_values, (offset_x, offset_y + 50), font, 1, (255, 255, 255), 2, cv.LINE_AA)

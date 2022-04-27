@@ -1,4 +1,5 @@
 from math import fabs
+from pickletools import uint8
 import numpy as np
 import cv2 as cv
 from modules.line_finding import blind_search, fit_polynomial
@@ -50,7 +51,7 @@ def draw_lane(original_img,binary_warped, left_fitx,right_fitx,ploty, inv_perspe
     cv.fillPoly(color_warp, np.int_([pts]), (0,255, 0))
 
     # Warp the blank back to original image space using inverse perspective matrix (Minv)
-    newwarp = cv.warpPerspective(color_warp, inv_perspective_M, (binary_warped.shape[1], binary_warped.shape[0])) 
+    newwarp = cv.warpPerspective(color_warp, inv_perspective_M, (original_img.shape[1], original_img.shape[0])) 
     # Combine the result with the original image
     result = cv.addWeighted(original_img, 1, newwarp, 0.3, 0)
 

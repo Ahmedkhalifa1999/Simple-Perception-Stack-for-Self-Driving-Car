@@ -52,15 +52,14 @@ def treshold_S_channel(image):
 
     return s_binary
 
-def treshold_S_channel(image):
+def Red_Green_tresh(image):
     
-    hls = cv2.cvtColor(image, cv2.COLOR_RGB2HLS)
-    s_channel = hls[:,:,2]
-    # Threshold S_channel
-    s_binary = np.zeros_like(s_channel)
-    s_binary[(s_channel >= 100) & (s_channel <= 255)] = 1
-
-    return s_binary
+    R = image[:,:,0]
+    G = image[:,:,1]
+    R_G_combined = np.zeros_like(R)
+    r_g_combined = (R > 155) & (G > 155)
+    
+    return r_g_combined
 
 def treshold_L_channel(image):
     

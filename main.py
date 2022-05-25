@@ -1,6 +1,7 @@
 import cv2 as cv
 import sys
 import os
+import time
 from modules.lane_detection import detect_lanes
 from modules.preprocessing import preprocess
 from modules.region_of_interest import perspective_transform
@@ -9,7 +10,7 @@ from modules.lane_metrics import *
 
 yolo = cv.dnn.readNetFromDarknet(os.path.join("YOLO", "yolov3.cfg"), os.path.join("YOLO", "yolov3.weights"))
 
-def process_frame(image):
+def process_frame(image, detection):
 
     equalized_image = cv.cvtColor(preprocess(image), cv.COLOR_BGR2HSV)
     warped_image, Minv = perspective_transform(equalized_image)
@@ -22,7 +23,10 @@ def process_frame(image):
     
     drawn_img = draw_lane(image,binary_warped, left_x, right_x, ploty,Minv)
     drawn_img_with_values = draw_values(drawn_img,left_curvature,right_curvature, center)
-
+    
+    if detection == False:
+        return drawn_img_with_values, warped_image, binary_warped
+        
     detected = drawn_img_with_values.copy()
 
     names = yolo.getLayerNames()
@@ -72,8 +76,8 @@ def main(input_path, output_path, debugging):
         # if frame is read correctly ret is True
         if not ret:
             break
-        detected_image, processed_frame, warped_frame, binary_warped_frame = process_frame(frame)
-        if debugging == 1:
+        if debugging == "True":
+            processed_frame, warped_frame, binary_warped_frame = process_frame(frame, False)
             debug_frame_upper = np.concatenate((cv.resize(frame, (640, 360)), cv.resize(processed_frame, (640, 360))), axis = 1)
             binary_warped_frame[binary_warped_frame] = 255
             debug_frame_lower = np.concatenate((cv.cvtColor(cv.resize(warped_frame, (640, 360)), cv.COLOR_HSV2BGR), 
@@ -82,6 +86,7 @@ def main(input_path, output_path, debugging):
             debug_frame = np.concatenate((debug_frame_upper, debug_frame_lower), axis = 0)
             video_writer.write(debug_frame)
         else:
+            detected_image, processed_frame, warped_frame, binary_warped_frame = process_frame(frame, True)
             video_writer.write(detected_image)
 
 if __name__ == "__main__":
@@ -91,4 +96,9 @@ if __name__ == "__main__":
         debugging = sys.argv[3]
     else:
         debugging = 0
+    if debugging == "True":
+        print("Debugging mode")
+    start = time.time()
     main(input_path, output_path, debugging)
+    end = time.time()
+    print("took {:.2f} minutes".format((end - start) / 60))
